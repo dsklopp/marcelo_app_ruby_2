@@ -1,0 +1,11 @@
+name             'marcelo_app_ruby_2'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures marcelo_app_ruby_2'
+long_description 'Installs/Configures marcelo_app_ruby_2'
+version          '0.1.0'
+
+depends 'apt'
+depends 'application'
+depends 'build-essential'
