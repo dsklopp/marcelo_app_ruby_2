@@ -10,7 +10,7 @@
 include_recipe "apt::default"
 include_recipe 'build-essential'
 
-package [ "git", "libsqlite3-dev" ]
+package [ "git", "libsqlite3-dev", "nodejs" ]
 
 directory "/srv/myapp" do
 	owner 'root'
@@ -28,5 +28,5 @@ execute 'bundle install' do
 end
 
 execute 'run rails' do
-	command 'cd /srv/myapp; rails server'
+	command 'cd /srv/myapp; rails server -b 192.168.17.19'
 end
