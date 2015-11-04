@@ -34,5 +34,5 @@ execute 'bundle install' do
 end
 
 execute 'run rails' do
-	command 'cd /srv/myapp; rails server -b 192.168.17.19'
+	command 'cd /srv/myapp; rails server -b 192.168.17.19 -d'
 end
