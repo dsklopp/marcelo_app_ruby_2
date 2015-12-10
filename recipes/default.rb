@@ -50,8 +50,8 @@ end
 
 
 execute "kill rails" do
- command "cd /srv/myapp"
- not_if '[ `ps -ef | grep rails` -lt 2 ]'
+	command "cd /srv/myapp; kill `ps -ef | grep rails | grep -v grep | awk '{print $2}' | tr '\n' ' '`"
+	not_if '[ `ps -ef | grep rails | grep -v grep | wc -l` -lt 1 ]'
 end
 
 execute "start rails" do
