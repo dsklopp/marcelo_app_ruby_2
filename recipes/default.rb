@@ -33,6 +33,31 @@ execute 'bundle install' do
 	command "cd /srv/myapp; bundle install"
 end
 
-execute 'run rails' do
-	command 'cd /srv/myapp; rails server -b 192.168.17.19 -d'
+execute 'rake db:create' do
+	command "cd /srv/myapp; bundle exec rake db:create"
 end
+
+execute 'rake db:migrate' do
+	command "cd /srv/myapp; bundle exec rake db:migrate"
+end
+
+execute 'rake db:seed' do
+	command "cd /srv/myapp; bundle exec rake db:seed"
+end
+
+
+#execute command to kill rails    //kill it if it's running 
+
+
+execute "kill rails" do
+ command "cd /srv/myapp"
+ not_if '[ `ps -ef | grep rails` -lt 2 ]'
+end
+
+execute "start rails" do
+ command "cd /srv/myapp; rails server -b 192.168.17.19 -d"
+end
+
+
+
+
