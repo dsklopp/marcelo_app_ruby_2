@@ -24,6 +24,39 @@ directory "/srv/myapp" do
 	mode '755'
 end
 
+file '/srv/myapp/a_file' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+end
+
+script "running a BASH script" do
+  interpreter "bash"
+  user "root"
+  cwd "/tmp"
+  code <<-EOH
+    echo Hello World    
+    echo My name is marcelo
+  EOH
+end
+
+cookbook_file "/srv/myapp/a_shell_script.sh" do
+  source "a_shell_script.sh"
+  mode 0755
+end
+
+execute "install shell script" do
+  command "sh /srv/myapp/a_shell_script.sh"
+end
+
+template "/etc/afile.sh" do
+	source "afile.sh.erb"
+	variables ({
+		name: 'Marcelo'
+	})
+end
+
 git 'rails app' do
 	repository 'https://github.com/decareano/blogtutorial.git'
 	destination "/srv/myapp"
@@ -45,9 +78,14 @@ execute 'rake db:seed' do
 	command "cd /srv/myapp; bundle exec rake db:seed"
 end
 
+#execute "kill rails" do
+ #command "cd /srv/myapp"
+ #not_if '[ `ps -ef | grep rails` -lt 2 ]'
+#end
 
-#execute command to kill rails    //kill it if it's running 
-
+#execute "start rails" do
+ #command "cd /srv/myapp; rails server -b 192.168.17.19 -d"
+#end
 
 execute "kill rails" do
 	command "cd /srv/myapp; kill `ps -ef | grep rails | grep -v grep | awk '{print $2}' | tr '\n' ' '`"
@@ -57,7 +95,3 @@ end
 execute "start rails" do
  command "cd /srv/myapp; rails server -b 192.168.17.19 -d"
 end
-
-
-
-
