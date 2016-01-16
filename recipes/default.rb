@@ -13,23 +13,17 @@ include_recipe 'build-essential'
 package [ "git", "libsqlite3-dev", "nodejs" ]
 
 %w(git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev 
-	libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
-	python-software-properties libffi-dev).each do |pack|
-	package pack
+  libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
+  python-software-properties libffi-dev).each do |pack|
+  package pack
 end
 
 directory "/srv/myapp" do
-	owner 'root'
-	group 'root'
-	mode '755'
-end
-
-file '/srv/myapp/a_file' do
   owner 'root'
   group 'root'
-  mode '0755'
-  action :create
+  mode '755'
 end
+
 
 script "running a BASH script" do
   interpreter "bash"
@@ -39,6 +33,11 @@ script "running a BASH script" do
     echo Hello World    
     echo My name is marcelo
   EOH
+end
+
+git '/srv/myapp' do
+  repository 'https://github.com/decareano/blogtutorial'
+    action :sync
 end
 
 cookbook_file "/srv/myapp/a_shell_script.sh" do
@@ -51,31 +50,32 @@ execute "install shell script" do
 end
 
 template "/etc/afile.sh" do
-	source "afile.sh.erb"
-	variables ({
-		name: 'Marcelo'
-	})
-end
-
-git 'rails app' do
-	repository 'https://github.com/decareano/blogtutorial.git'
-	destination "/srv/myapp"
+  source "afile.sh.erb"
+  variables ({
+    name: 'Marcelo'
+  })
 end
 
 execute 'bundle install' do
-	command "cd /srv/myapp; bundle install"
+  command "cd /srv/myapp; bundle install"
 end
 
 execute 'rake db:create' do
-	command "cd /srv/myapp; bundle exec rake db:create"
+  command "cd /srv/myapp; bundle exec rake db:create"
+  not_if { File.exists?("/srv/myapp/db/development.sqlite3") }
+  notifies :run, 'execute[rake db:migrate]', :immediately
 end
 
 execute 'rake db:migrate' do
-	command "cd /srv/myapp; bundle exec rake db:migrate"
+  command "cd /srv/myapp; bundle exec rake db:migrate"
+  action :nothing
+  notifies :run, 'execute[rake db:seed]', :immediately
+
 end
 
 execute 'rake db:seed' do
-	command "cd /srv/myapp; bundle exec rake db:seed"
+  command "cd /srv/myapp; bundle exec rake db:seed"
+  action :nothing
 end
 
 #execute "kill rails" do
@@ -88,8 +88,8 @@ end
 #end
 
 execute "kill rails" do
-	command "cd /srv/myapp; kill `ps -ef | grep rails | grep -v grep | awk '{print $2}' | tr '\n' ' '`"
-	not_if '[ `ps -ef | grep rails | grep -v grep | wc -l` -lt 1 ]'
+  command "cd /srv/myapp; kill `ps -ef | grep rails | grep -v grep | awk '{print $2}' | tr '\n' ' '`"
+  not_if '[ `ps -ef | grep rails | grep -v grep | wc -l` -lt 1 ]'
 end
 
 execute "start rails" do
