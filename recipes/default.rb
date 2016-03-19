@@ -25,6 +25,8 @@ cookbook_file "/usr/share/nginx/index.html" do
   mode "0644"
 end
 
+
+
 %w(git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev 
   libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev
   python-software-properties libffi-dev).each do |pack|
@@ -125,3 +127,23 @@ user 'marcelo' do
   shell '/bin/bash'
   password 'test'
 end
+
+%w{test1 test2 test3}.each do |dir|
+  directory "/tmp/mydirs/#{dir}" do
+    mode '0755'
+    owner 'root'
+    group 'root'
+    action :create
+    recursive true
+  end
+end
+
+user_home = "/#{node[:nginx][:user]}"
+
+directory user_home do
+  owner 'node[:nginx][:user]'
+  group 'node[:nginx][:group]'
+  mode '0755'
+  action :create
+end
+
